@@ -21,6 +21,7 @@ test('success', function(assert) {
 });
 
 
+// This passes with 2.14.x fails with 2.15.x
 test('error', function(assert) {
   assert.expect(1);
 
