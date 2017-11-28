@@ -1,3 +1,4 @@
+import Ember from 'ember';
 import { moduleForComponent, test } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
 import RSVP from 'rsvp';
@@ -25,7 +26,19 @@ test('success', function(assert) {
 test('error', function(assert) {
   assert.expect(1);
 
-  this.set('promise', RSVP.reject('bar'));
+  let exception = Ember.Test.adapter.exception;
+
+  Ember.Test.adapter.exception = function(reason) {
+    if (reason !== 'bar') { exception(reason); }
+
+    // otherwise suppress assertion
+  };
+
+  try {
+    this.set('promise', RSVP.reject('bar'));
+  } finally {
+    Ember.Test.adapter.exception = exception;
+  }
 
   this.render(hbs`{{my-component promise=promise}}`);
 
