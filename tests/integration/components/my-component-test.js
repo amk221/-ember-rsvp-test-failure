@@ -25,7 +25,11 @@ test('success', function(assert) {
 test('error', function(assert) {
   assert.expect(1);
 
-  this.set('promise', RSVP.reject('bar'));
+  let promise = RSVP.reject('bar')
+  // avoid unhandled rejection assertion
+  promise.catch(() => {});
+
+  this.set('promise', promise);
 
   this.render(hbs`{{my-component promise=promise}}`);
 
