@@ -4,16 +4,26 @@ import RSVP from 'rsvp';
 import wait from 'ember-test-helpers/wait';
 
 moduleForComponent('my-component', {
-  integration: true
+  integration: true,
+
+  beforeEach() {
+    this.set('promise', new RSVP.Promise((resolve, reject) => {
+      this.resolveWith = resolve;
+      this.rejectWith = reject;
+    }));
+
+    this.render(hbs`{{my-component promise=promise}}`);
+  }
 });
 
+test('pending', function(assert) {
+  assert.equal(this.$().text(), 'please wait');
+});
 
 test('success', function(assert) {
   assert.expect(1);
 
-  this.set('promise', RSVP.resolve('foo'));
-
-  this.render(hbs`{{my-component promise=promise}}`);
+  this.resolveWith('foo');
 
   return wait().then(() => {
     assert.equal(this.$().text(), 'result: foo');
@@ -25,9 +35,7 @@ test('success', function(assert) {
 test('error', function(assert) {
   assert.expect(1);
 
-  this.set('promise', RSVP.reject('bar'));
-
-  this.render(hbs`{{my-component promise=promise}}`);
+  this.rejectWith('bar');
 
   return wait().then(() => {
     assert.equal(this.$().text(), 'error: bar');
